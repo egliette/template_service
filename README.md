@@ -47,6 +47,11 @@ This repository is a reusable template for new Python services. It includes a se
   - Purpose: Used by the scripts when running `docker exec -it <container> /bin/bash`
   - How: Set `CONTAINER_NAME` near the top of each script (dev: your dev app container; prod: your prod app container)
 
+- **App service name(s) for Docker Compose**
+  - Where: `scripts/dev-compose.sh`, `scripts/prod-compose.sh`, `scripts/test-compose.sh`
+  - Purpose: Used by the scripts to reference the correct service in docker-compose commands
+  - How: Set `APP_SERVICE` near the top of each script (dev: "app"; prod: "app_prod"; test: "app_test")
+
 - **Compose network for local runs**
   - Where: `scripts/dev-compose.sh`, `scripts/prod-compose.sh`
   - Purpose: Ensure a consistent Docker network exists locally
@@ -77,10 +82,16 @@ LOG_MAX_DAYS="30"
 # scripts/dev-compose.sh
 NETWORK_NAME="your_local_network"
 CONTAINER_NAME="your_dev_container_name"
+APP_SERVICE="app"
 
 # scripts/prod-compose.sh
 NETWORK_NAME="your_local_network"
 CONTAINER_NAME="your_prod_container_name"
+APP_SERVICE="app_prod"
+
+# scripts/test-compose.sh
+NETWORK_NAME="your_local_network"
+APP_SERVICE="app_test"
 ```
 
 3) Update CI network name in `ci.yml`:
@@ -112,6 +123,7 @@ env:
 ## 6. 📝 Notes
 
 - Ensure `CONTAINER_NAME` matches the actual container name from your compose files when using `--shell`.
+- Ensure `APP_SERVICE` matches the service name defined in your docker-compose files.
 - Ensure `NETWORK_NAME` in scripts and `DOCKER_NETWORK_NAME` in CI are consistent with your compose definitions.
 - The `logs/` directory is created on startup if missing; permissions are adjusted using `APP_UID`/`APP_GID`.
 
