@@ -160,15 +160,42 @@ script_location = %(here)s/alembic
 
 Provide `DATABASE_URL` via environment when running Alembic.
 
-4) Wire your models’ metadata in `app/alembic/env.py` so autogenerate works. Example:
+4) Wire your models and settings in `app/alembic/env.py`**
+
+Open `app/alembic/env.py` and make these changes:
 
 ```python
-from app.models.base import Base  # adjust to your Base definition
+import sys, os
 
+# Add the app directory to the Python path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from app.config.settings import settings
+from app.models.base import Base  # adjust to your Base definition
+from app.models.user import User  # import all models you want Alembic to migrate
+```
+
+Then set your target metadata so Alembic knows what to track:
+
+```python
 target_metadata = Base.metadata
 ```
 
-Ensure imports here do not require full app startup.
+Update both migration functions to use your app’s database URL instead of `alembic.ini`:
+
+```python
+def run_migrations_offline():
+    url = settings.DATABASE_URL
+    context.configure(url=url, target_metadata=target_metadata, literal_binds=True)
+```
+
+```python
+def run_migrations_online():
+    configuration = config.get_section(config.config_ini_section, {})
+    configuration["sqlalchemy.url"] = settings.DATABASE_URL
+    connectable = engine_from_config(configuration, prefix="sqlalchemy.", poolclass=pool.NullPool)
+```
+
 
 ### 7.2 📜 Common commands (run from repo root)
 
