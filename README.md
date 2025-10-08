@@ -145,13 +145,17 @@ pip install alembic
 alembic init app/alembic
 ```
 
-This creates `app/alembic/` with `env.py` and a `versions/` directory, plus an `alembic.ini` in the repo root.
+This creates `app/alembic/` with `env.py` and a `versions/` directory, **plus an `alembic.ini` in the repo root**.
+So we need to move the `.ini` file manually:
 
-3) Edit `alembic.ini` to set the script location and DB URL source:
+```bash
+mv alembic.ini app/alembic.ini
+```
+
+3) Edit `app/alembic.ini` to set the script location:
 
 ```ini
-script_location = app/alembic
-sqlalchemy.url = %(DATABASE_URL)s
+script_location = %(here)s/alembic
 ```
 
 Provide `DATABASE_URL` via environment when running Alembic.
